@@ -5,7 +5,7 @@
   <img src="https://i.imgur.com/tjPOPhB.png" alt="AutoHotkey Logo" width="100"/>
 </p>
 
-*Script* AutoHotkey (AHK) otomatis, ringan, dan mudah digunakan yang dirancang untuk meningkatkan pengalaman bermain kamu di **[Nama Game Roblox Kamu]**.
+*Script* AutoHotkey (AHK) otomatis, ringan, dan mudah digunakan yang dirancang untuk meningkatkan pengalaman bermain kamu.
 
 ---
 
@@ -25,10 +25,4 @@ Sebelum menjalankan *script* ini, pastikan kamu sudah menginstal:
 2. **Aplikasi Roblox Client** (Disarankan versi Desktop)
 
 ---
-
-## 📥 Cara Instalasi & Penggunaan
-
-1. **Unduh Script**:
-   - *Clone* repositori ini atau unduh file `.ahk` secara langsung lewat bagian [Releases](../../releases).
-   ```bash
-   git clone [https://github.com/username-kamu/nama-repo-kamu.git](https://github.com/username-kamu/nama-repo-kamu.git)
+Semoga Bermanfaat
