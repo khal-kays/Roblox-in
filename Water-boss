@@ -1,0 +1,182 @@
+; ==============================================================================
+; DIREKTIF & INISIALISASI VARIABEL
+; ==============================================================================
+#NoEnv
+#SingleInstance Force
+SendMode Input
+SetBatchLines -1
+
+; ------------------------------------------------------------------------------
+; PENGATURAN INTERVAL WAKTU (Dalam Milidetik)
+; 1500 detik = 1,500,000 milidetik (ms)
+; Ubah angka ini jika ingin mengganti interval waktu perulangan!
+; Contoh: 1000 = 1 detik, 60000 = 1 menit, 1500000 = 25 menit (1500 detik)
+; ------------------------------------------------------------------------------
+IntervalWaktu := 1500
+
+; Variabel Status Global
+MenuOn := false
+IsPaused := false
+
+StatusAutoAksi := "OFF"
+PrevAutoAksi := "OFF"
+
+; Variabel Timestamp untuk Deteksi Double-Press
+F5PressTime := 0
+
+return ; Akhir dari Auto-Execute Section
+
+; ==============================================================================
+; HOTKEY +F5 / F5 (ON / OFF / EXIT DENGAN DOUBLE-PRESS)
+; ==============================================================================
++F5::
+F5::
+    if (MenuOn = false) 
+    {
+        StatusAutoAksi := "OFF"
+        IsPaused := false
+        
+        MenuOn := true
+        F5PressTime := A_TickCount
+        Gosub, UpdateToolTip
+        return
+    }
+    
+    if (MenuOn = true) 
+    {
+        if (A_TickCount - F5PressTime < 400) 
+        {
+            SetTimer, TimerAutoAksi, Off
+            ToolTip
+            ExitApp
+        } 
+        else 
+        {
+            SetTimer, TimerAutoAksi, Off
+            
+            StatusAutoAksi := "OFF"
+            IsPaused := false
+            MenuOn := false
+            ToolTip
+        }
+        F5PressTime := A_TickCount
+    }
+return
+
+; ==============================================================================
+; HOTKEY ~Ctrl / ~+Ctrl (PAUSE / RESUME)
+; ==============================================================================
+~+Ctrl::
+~Ctrl::
+    Gosub, PauseToggle
+return
+
+PauseToggle:
+    if (MenuOn = false)
+        return
+        
+    IsPaused := !IsPaused
+    
+    if (IsPaused) 
+    {
+        PrevAutoAksi := StatusAutoAksi
+        
+        SetTimer, TimerAutoAksi, Off
+        
+        if (StatusAutoAksi = "ON") 
+            StatusAutoAksi := "PAUSED"
+            
+        SoundBeep, 400, 200
+    } 
+    else 
+    {
+        StatusAutoAksi := PrevAutoAksi
+        
+        if (StatusAutoAksi = "ON") 
+            SetTimer, TimerAutoAksi, %IntervalWaktu%
+        
+        SoundBeep, 800, 80
+        SoundBeep, 1000, 80
+    }
+    
+    Gosub, UpdateToolTip
+return
+
+; ==============================================================================
+; HOTKEY TOGGLE AUTO SPASI + E + KLIK KIRI (Tekan F6)
+; ==============================================================================
+F6::
+    if (MenuOn = false || IsPaused)
+        return
+
+    if (StatusAutoAksi = "OFF") 
+    {
+        StatusAutoAksi := "ON"
+        
+        ; Jalankan sekali langsung saat diaktifkan
+        Gosub, TimerAutoAksi
+        
+        ; Set timer perulangan sesuai variabel IntervalWaktu
+        SetTimer, TimerAutoAksi, %IntervalWaktu%
+        SoundBeep, 900, 100
+    } 
+    else 
+    {
+        StatusAutoAksi := "OFF"
+        SetTimer, TimerAutoAksi, Off
+        SoundBeep, 500, 100
+    }
+
+    Gosub, UpdateToolTip
+return
+
+; ==============================================================================
+; TIMER CALLBACK (Mengeksekusi Spasi, E, dan Klik Kiri)
+; ==============================================================================
+TimerAutoAksi:
+    if (IsPaused) 
+    {
+        SetTimer, TimerAutoAksi, Off
+        return
+    }
+    
+    ; Eksekusi urutan tombol
+    SendInput {Space}
+    Sleep, 100
+    SendInput e
+    Sleep, 100
+    Click
+return
+
+; ==============================================================================
+; SUBROUTINE UPDATE TOOLTIP
+; ==============================================================================
+UpdateToolTip:
+    if (MenuOn = false) 
+    {
+        ToolTip
+        return
+    }
+    
+    ; Kalkulasi teks durasi interval untuk tampilan ToolTip (dalam detik)
+    DetikInterval := IntervalWaktu / 1000
+    
+    if (IsPaused) 
+    {
+        menuText := "===== MACRO STATUS [PAUSED] =====`n"
+    } 
+    else 
+    {
+        menuText := "===== MACRO STATUS (F5) =====`n"
+    }
+    
+    menuText .= "--------------------------------`n"
+    menuText .= "[F5]      Menu/Exit   : ON`n"
+    menuText .= "[F6]      Spasi+E+Klik: " . StatusAutoAksi . "`n"
+    menuText .= "--------------------------------`n"
+    menuText .= "Interval  : " . DetikInterval . " Detik`n"
+    menuText .= "--------------------------------`n"
+    menuText .= "* [Ctrl] Pause/Resume  [F5] Off  [F5 x2] Exit"
+    
+    ToolTip, %menuText%, 10, 120
+return
