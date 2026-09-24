@@ -5,7 +5,7 @@
 #SingleInstance Force
 SendMode Input
 SetBatchLines -1
-
+ 
 ; ------------------------------------------------------------------------------
 ; PENGATURAN INTERVAL WAKTU (Dalam Milidetik)
 ; 1500 detik = 1,500,000 milidetik (ms)
